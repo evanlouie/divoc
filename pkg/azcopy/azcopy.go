@@ -9,12 +9,13 @@ import (
 
 type ServicePrincipal struct {
 	ApplicationId string
-	DisplayName   string
-	Name          string
 	Password      string
 	Tenant        string
+	//DisplayName   string
+	//Name          string
 }
 
+// Login to azcopy via the provided service principal
 func Login(principal ServicePrincipal) error {
 	cmd := exec.Command("azcopy",
 		"login",
@@ -31,6 +32,7 @@ func Login(principal ServicePrincipal) error {
 	return nil
 }
 
+// Copy data from one place to another
 func Copy(from string, to string) error {
 	cmd := exec.Command("azcopy", "copy", from, to, "--recursive")
 	cmd.Stdout = os.Stdout

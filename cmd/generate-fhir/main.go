@@ -14,17 +14,21 @@ func main() {
 	////////////////////////////////////////////////////////////////////////////////
 	// Parse command line args
 	////////////////////////////////////////////////////////////////////////////////
+	// Synthea flags
 	populationPtr := flag.Int("population", 100, "Sample size for Synthea to generate")
 	state := flag.String("state", "California", "State which the sample size will be generated in")
 	city := flag.String("city", "San Francisco", "City which the sample size will be generated in")
 	csv := flag.Bool("csv", false, "Generate CSV output in addition to FHIR")
 	ndjson := flag.Bool("ndjson", false, "Generate bulk FHIR dumps in NDJSON format (standard JSON will not be generated)")
+
+	// azcopy flags
 	noClean := flag.Bool("no-clean", false, "Don't cleanup temporary directories after running -- useful if you want to generated output locally")
-	spClientId := flag.String("sp-client-id", "", "Service principal client ID to authenticate with azcopy")
+	spClientId := flag.String("sp-client-id", "", "Service principal client ID to authenticate with azcopy -- The principal must have 'Storage Blob Data Contributor' role on the target storage account")
 	spClientSecret := flag.String("sp-client-secret", "", "Service principal client secret to authenticate with azcopy")
 	spTenantId := flag.String("sp-tenant-id", "", "Service principal tenant ID to authenticate with azcopy")
 	storageAccount := flag.String("storage-account", "", "Azure storage account name to push FHIR data to")
 	storageContainer := flag.String("storage-container", "", "Azure storage blob container name to push FHIR data to")
+
 	flag.Parse()
 
 	// Validate flags
