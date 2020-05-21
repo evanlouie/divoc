@@ -2,12 +2,12 @@
 
 ## Requirements
 
-| Dependency | Version | Description                                                                             |
-| ---------- | ------- | --------------------------------------------------------------------------------------- |
-| Git        |         | Used to clone the [Synthea](https://github.com/synthetichealth/synthea) project locally |
-| Go         | `1.14`  | The core runtime for this project                                                       |
-| Java       | `>1.8`  | Used to run [Synthea](https://github.com/synthetichealth/synthea)                       |
-| azcopy     | `10`    | Used to migrate generate FHIR files from host to Azure storage                          |
+| Dependency | Version  | Description                                                                             |
+| ---------- | -------- | --------------------------------------------------------------------------------------- |
+| Git        |          | Used to clone the [Synthea](https://github.com/synthetichealth/synthea) project locally |
+| Go         | `>=1.14` | The core runtime for this project                                                       |
+| Java       | `>=1.8`  | Used to run [Synthea](https://github.com/synthetichealth/synthea)                       |
+| azcopy     | `>=10`   | Used to migrate generate FHIR files from host to Azure storage                          |
 
 ## Sample Usage
 
