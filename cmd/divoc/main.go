@@ -11,7 +11,9 @@ import (
 )
 
 func main() {
+	////////////////////////////////////////////////////////////////////////////////
 	// Parse command line args
+	////////////////////////////////////////////////////////////////////////////////
 	populationPtr := flag.Int("population", 100, "Sample size for Synthea to generate")
 	state := flag.String("state", "California", "State which the sample size will be generated in")
 	city := flag.String("city", "San Francisco", "City which the sample size will be generated in")
@@ -42,7 +44,9 @@ func main() {
 		logger.Fatal("storage-container required")
 	}
 
+	////////////////////////////////////////////////////////////////////////////////
 	// Check for all required host dependencies
+	////////////////////////////////////////////////////////////////////////////////
 	logger.Info("Checking for required host dependencies...")
 	var requiredSystemTools = []string{"git", "java", "azcopy"}
 	for _, tool := range requiredSystemTools {
@@ -55,9 +59,13 @@ func main() {
 	}
 	logger.Info("All host dependencies found!")
 
+	////////////////////////////////////////////////////////////////////////////////
+	// Generate data FHIR data with Synthea
+	////////////////////////////////////////////////////////////////////////////////
 	if err := synthea.Clone(); err != nil {
 		logger.Fatal(err)
 	}
+	// only clean if -no-clean was passed
 	if *noClean == false {
 		defer synthea.Clean()
 	}
@@ -91,9 +99,12 @@ func main() {
 	syntheaOut := path.Join(installPath, "output")
 	logger.Info(fmt.Sprintf("Completed generating fhir data at: %s", syntheaOut))
 
+	////////////////////////////////////////////////////////////////////////////////
 	// Copy data to Azure storage
+	////////////////////////////////////////////////////////////////////////////////
 	targetBlob := fmt.Sprintf("https://%s.blob.core.windows.net/%s", *storageAccount, *storageContainer)
 	logger.Info(fmt.Sprintf("Beginning data migration from %s to %s", syntheaOut, targetBlob))
+	// Login to azcopy
 	err = azcopy.Login(azcopy.ServicePrincipal{
 		ApplicationId: *spClientId,
 		Password:      *spClientSecret,
@@ -102,7 +113,8 @@ func main() {
 	if err != nil {
 		logger.Fatal(err)
 	}
-	if err = azcopy.Copy(fmt.Sprintf("%s/*", syntheaOut), targetBlob); err != nil {
+	// Copy the contents of the synthea output directory to azure storage
+	if err = azcopy.Copy(path.Join(syntheaOut, "*"), targetBlob); err != nil {
 		logger.Fatal(err)
 	}
 	logger.Info("Copying complete!")
