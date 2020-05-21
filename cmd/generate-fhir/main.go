@@ -101,7 +101,7 @@ func main() {
 		logger.Fatal(err)
 	}
 	syntheaOut := path.Join(installPath, "output")
-	logger.Info(fmt.Sprintf("Completed generating fhir data at: %s", syntheaOut))
+	logger.Info(fmt.Sprintf("Completed generating FHIR data at: %s", syntheaOut))
 
 	////////////////////////////////////////////////////////////////////////////////
 	// Copy data to Azure storage
@@ -121,5 +121,5 @@ func main() {
 	if err = azcopy.Copy(path.Join(syntheaOut, "*"), targetBlob); err != nil {
 		logger.Fatal(err)
 	}
-	logger.Info("Copying complete!")
+	logger.Info("Transfer complete!")
 }
