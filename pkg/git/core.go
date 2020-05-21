@@ -1,6 +1,7 @@
 package git
 
 import (
+	"divoc/pkg/dependency"
 	"divoc/pkg/logger"
 	"fmt"
 	"os"
@@ -13,6 +14,7 @@ type CloneOptions struct {
 	Depth int
 }
 
+// Clone a git repository based on the provided CloneOptions
 func Clone(options CloneOptions) (err error) {
 	// prepare clone command
 	cloneCmd := exec.Command("git", "clone", options.Repo)
@@ -33,4 +35,11 @@ func Clone(options CloneOptions) (err error) {
 	}
 
 	return err
+}
+
+func init() {
+	// Check for host dependencies
+	if errs := dependency.IsInstalled("git"); errs != nil {
+		logger.Fatal(errs)
+	}
 }

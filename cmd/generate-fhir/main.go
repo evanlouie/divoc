@@ -1,12 +1,12 @@
 package main
 
 import (
-	"divoc/pkg/azcopy"
+	"divoc/pkg/azure/auth"
+	"divoc/pkg/azure/azcopy"
 	"divoc/pkg/logger"
 	"divoc/pkg/synthea"
 	"flag"
 	"fmt"
-	"os/exec"
 	"path"
 )
 
@@ -47,21 +47,6 @@ func main() {
 	if *storageContainer == "" {
 		logger.Fatal("storage-container required")
 	}
-
-	////////////////////////////////////////////////////////////////////////////////
-	// Check for all required host dependencies
-	////////////////////////////////////////////////////////////////////////////////
-	logger.Info("Checking for required host dependencies...")
-	var requiredSystemTools = []string{"git", "java", "azcopy"}
-	for _, tool := range requiredSystemTools {
-		lookPath, err := exec.LookPath(tool)
-		if err != nil {
-			logger.Fatal(err)
-		} else {
-			logger.Info(fmt.Sprintf("Found %s at %s", tool, lookPath))
-		}
-	}
-	logger.Info("All host dependencies found!")
 
 	////////////////////////////////////////////////////////////////////////////////
 	// Generate data FHIR data with Synthea
@@ -108,15 +93,17 @@ func main() {
 	////////////////////////////////////////////////////////////////////////////////
 	targetBlob := fmt.Sprintf("https://%s.blob.core.windows.net/%s", *storageAccount, *storageContainer)
 	logger.Info(fmt.Sprintf("Beginning data migration from %s to %s", syntheaOut, targetBlob))
-	// Login to azcopy
-	err = azcopy.Login(azcopy.ServicePrincipal{
+
+	// Login to azcopy with provided SP
+	sp := auth.ServicePrincipal{
 		ApplicationId: *spClientId,
 		Password:      *spClientSecret,
 		Tenant:        *spTenantId,
-	})
-	if err != nil {
+	}
+	if err = azcopy.Login(sp); err != nil {
 		logger.Fatal(err)
 	}
+
 	// Copy the contents of the synthea output directory to azure storage
 	if err = azcopy.Copy(path.Join(syntheaOut, "*"), targetBlob); err != nil {
 		logger.Fatal(err)

@@ -1,22 +1,16 @@
 package azcopy
 
 import (
+	"divoc/pkg/azure/auth"
+	"divoc/pkg/dependency"
 	"divoc/pkg/logger"
 	"fmt"
 	"os"
 	"os/exec"
 )
 
-type ServicePrincipal struct {
-	ApplicationId string
-	Password      string
-	Tenant        string
-	//DisplayName   string
-	//Name          string
-}
-
 // Login to azcopy via the provided service principal
-func Login(principal ServicePrincipal) error {
+func Login(principal auth.ServicePrincipal) error {
 	cmd := exec.Command("azcopy",
 		"login",
 		"--service-principal",
@@ -32,7 +26,9 @@ func Login(principal ServicePrincipal) error {
 	return nil
 }
 
-// Copy data from one place to another
+// Copy data from one location to another.
+// Shells out to azcopy under the hood, so it supports any `from` and `to` that binary does.
+// Must run Login() prior to usage unless host has already logged in by other means.
 func Copy(from string, to string) error {
 	cmd := exec.Command("azcopy", "copy", from, to, "--recursive")
 	cmd.Stdout = os.Stdout
@@ -41,4 +37,11 @@ func Copy(from string, to string) error {
 		return err
 	}
 	return nil
+}
+
+func init() {
+	// Check for host dependencies
+	if errs := dependency.IsInstalled("git"); errs != nil {
+		logger.Fatal(errs)
+	}
 }
