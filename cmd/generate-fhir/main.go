@@ -54,7 +54,7 @@ func main() {
 	if err := synthea.Clone(); err != nil {
 		logger.Fatal(err)
 	}
-	// only clean if -no-clean was passed
+	// clean up if no-clean set to false
 	if *noClean == false {
 		defer synthea.Clean()
 	}

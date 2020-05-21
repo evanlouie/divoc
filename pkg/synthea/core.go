@@ -10,7 +10,6 @@ import (
 	"os"
 	"os/exec"
 	"path"
-	"runtime"
 )
 
 type syntheaState struct {
@@ -76,31 +75,26 @@ type CliArgs struct {
 	City           string
 }
 
-// Run the Synthea in a child process.
-// Uses `sh` on all windows hosts.
-// Uses `cmd.exe` on windows.
+// Run the run_synthea script in a child process.
 func Run(args CliArgs) error {
 	if state.installPath == "" {
 		return fmt.Errorf("zero-length path to synthea set")
 	}
 
-	// use `sh` as shell script executor be default, use `cmd.exe` if host is windows
-	executor := "sh"
-	if runtime.GOOS == "windows" {
-		executor = "cmd.exe"
-	}
-
-	var cmd = exec.Command(executor, "run_synthea", "-p", "128", "California", "San Francisco")
+	var cmdArgs []string
 	if args.Seed != 0 {
-		cmd.Args = append(cmd.Args, "-s", fmt.Sprintf("%d", args.Seed))
+		cmdArgs = append(cmdArgs, "-s", fmt.Sprintf("%d", args.Seed))
 	}
 	if args.PopulationSize != 0 {
-		cmd.Args = append(cmd.Args, "-p", fmt.Sprintf("%d", args.PopulationSize))
+		cmdArgs = append(cmdArgs, "-p", fmt.Sprintf("%d", args.PopulationSize))
 	}
 	if args.ModuleFilter != "" {
-		cmd.Args = append(cmd.Args, "-m", args.ModuleFilter)
+		cmdArgs = append(cmdArgs, "-m", args.ModuleFilter)
 	}
-	cmd.Args = append(cmd.Args, args.State, args.City)
+	cmdArgs = append(cmdArgs, args.State, args.City)
+	syntheaBin := path.Join(state.installPath, "run_synthea")
+
+	cmd := exec.Command(syntheaBin, cmdArgs...)
 	cmd.Dir = state.installPath
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -112,7 +106,7 @@ func Run(args CliArgs) error {
 // Returns an error if the the installPath has not been set in package state.
 func GetInstallPath() (string, error) {
 	if state.installPath == "" {
-		return "", errors.New("Synthea not installed -- must run synthea.Clone()")
+		return "", errors.New("synthea not installed -- must run synthea.Clone()")
 	}
 	return state.installPath, nil
 }

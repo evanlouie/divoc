@@ -1,10 +1,9 @@
 package logger
 
 import (
+	"github.com/sirupsen/logrus"
 	"os"
 	"sync"
-
-	"github.com/sirupsen/logrus"
 )
 
 // lock is a global mutex lock to gain control of logrus.<SetLevel|SetOutput>
@@ -85,6 +84,7 @@ func init() {
 	formatter := new(logrus.TextFormatter)
 	formatter.TimestampFormat = "02-01-2006 15:04:05"
 	formatter.FullTimestamp = true
+	formatter.DisableTimestamp = true
 	logrus.SetFormatter(formatter)
 	logrus.SetOutput(os.Stdout) // Set output to stdout; set to stderr by default
 	logrus.SetLevel(logrus.InfoLevel)
