@@ -1,12 +1,12 @@
 package synthea
 
 import (
-	"divoc/pkg/dependency"
-	"divoc/pkg/git"
-	"divoc/pkg/logger"
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"microsoft.com/divoc/pkg/dependency"
+	"microsoft.com/divoc/pkg/git"
+	"microsoft.com/divoc/pkg/logger"
 	"os"
 	"os/exec"
 	"path"

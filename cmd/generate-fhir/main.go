@@ -1,12 +1,12 @@
 package main
 
 import (
-	"divoc/pkg/azure/auth"
-	"divoc/pkg/azure/azcopy"
-	"divoc/pkg/logger"
-	"divoc/pkg/synthea"
 	"flag"
 	"fmt"
+	"microsoft.com/divoc/pkg/azure/auth"
+	"microsoft.com/divoc/pkg/azure/azcopy"
+	"microsoft.com/divoc/pkg/logger"
+	"microsoft.com/divoc/pkg/synthea"
 	"path"
 )
 

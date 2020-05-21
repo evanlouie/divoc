@@ -1,10 +1,10 @@
 package azcopy
 
 import (
-	"divoc/pkg/azure/auth"
-	"divoc/pkg/dependency"
-	"divoc/pkg/logger"
 	"fmt"
+	"microsoft.com/divoc/pkg/azure/auth"
+	"microsoft.com/divoc/pkg/dependency"
+	"microsoft.com/divoc/pkg/logger"
 	"os"
 	"os/exec"
 )

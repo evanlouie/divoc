@@ -1,9 +1,9 @@
 package git
 
 import (
-	"divoc/pkg/dependency"
-	"divoc/pkg/logger"
 	"fmt"
+	"microsoft.com/divoc/pkg/dependency"
+	"microsoft.com/divoc/pkg/logger"
 	"os"
 	"os/exec"
 )

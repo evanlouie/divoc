@@ -1,4 +1,4 @@
-module divoc
+module microsoft.com/divoc
 
 go 1.14
 
