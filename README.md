@@ -2,12 +2,12 @@
 
 ## Requirements
 
-| Dependency | Version  | Description                                                                             |
-| ---------- | -------- | --------------------------------------------------------------------------------------- |
-| Git        |          | Used to clone the [Synthea](https://github.com/synthetichealth/synthea) project locally |
-| Go         | `>=1.14` | The core runtime for this project                                                       |
-| Java       | `>=1.8`  | Used to run [Synthea](https://github.com/synthetichealth/synthea)                       |
-| azcopy     | `>=10`   | Used to migrate generate FHIR files from host to Azure storage                          |
+| Dependency | Version           | Description                                                                             |
+| ---------- | ----------------- | --------------------------------------------------------------------------------------- |
+| Git        |                   | Used to clone the [Synthea](https://github.com/synthetichealth/synthea) project locally |
+| Go         | `>=1.14`          | The core runtime for this project                                                       |
+| Java       | `>=1.8` & `<1.14` | Used to run [Synthea](https://github.com/synthetichealth/synthea)                       |
+| azcopy     | `>=10`            | Used to migrate generate FHIR files from host to Azure storage                          |
 
 ## Commands
 
@@ -22,6 +22,8 @@ storage account container using `azcopy`.
 > Run `go run cmd/generate-fhir/main.go --help` to view descriptions of all
 > available flags.
 
+#### Basic
+
 ```shell script
 SP_CLIENT_ID=<your service princpal client ID>
 SP_CLIENT_SECRET=<your service princpal client secret>
@@ -30,9 +32,9 @@ STORAGE_ACCOUNT=<your storage account name>
 STORAGE_CONTAINER=<your target storage container (can contain a target subdirectory)>
 
 go run cmd/generate-fhir/main.go \
-    -csv \
-    -ndjson \
-    -population 10 \
+    -synthea-csv \
+    -synthea-ndjson \
+    -synthea-population 10 \
     -sp-client-id $SP_CLIENT_ID \
     -sp-client-secret $SP_CLIENT_SECRET \
     -sp-tenant-id $SP_TENANT_ID \

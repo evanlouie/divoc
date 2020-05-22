@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"microsoft.com/divoc/pkg/dependency"
 	"microsoft.com/divoc/pkg/git"
 	"microsoft.com/divoc/pkg/logger"
 	"os"
@@ -12,12 +11,9 @@ import (
 	"path"
 )
 
-type syntheaState struct {
-	installPath string
-}
-
-// Package state variable to hold runtime state
-var state = syntheaState{}
+// Path to cloned synthea repo on host
+// if nil, it has not been cloned or set by user
+var InstallPath *string
 
 // Clone the Synthea repository locally to a temporary directory
 func Clone() (err error) {
@@ -26,7 +22,7 @@ func Clone() (err error) {
 	if err != nil {
 		return err
 	}
-	state.installPath = tempDir
+	InstallPath = &tempDir
 
 	// Execute cloning
 	logger.Info(fmt.Sprintf("Cloning Synthea repository to %s", tempDir))
@@ -39,8 +35,8 @@ func Clone() (err error) {
 
 // Clean the temporary clone directory created from Clone()
 func Clean() (err error) {
-	logger.Info(fmt.Sprintf("Cleaning temporary directory %s", state.installPath))
-	return os.RemoveAll(state.installPath)
+	logger.Info(fmt.Sprintf("Cleaning temporary Synthea directory %s", *InstallPath))
+	return os.RemoveAll(*InstallPath)
 }
 
 type Options map[string]string
@@ -49,7 +45,7 @@ type Options map[string]string
 // cloned repository created from Clone()
 func SetOptions(options Options) error {
 	// Append to src/main/resources/synthea.properties to set feature flags
-	var propertiesPath = path.Join(state.installPath, "src", "main", "resources", "synthea.properties")
+	var propertiesPath = path.Join(*InstallPath, "src", "main", "resources", "synthea.properties")
 	pFile, err := os.OpenFile(propertiesPath, os.O_APPEND|os.O_WRONLY, 0644)
 	if err != nil {
 		return err
@@ -77,8 +73,12 @@ type CliArgs struct {
 
 // Run the run_synthea script in a child process.
 func Run(args CliArgs) error {
-	if state.installPath == "" {
+	if *InstallPath == "" {
 		return fmt.Errorf("zero-length path to synthea set")
+	}
+	// Ensure Java is on user PATH
+	if _, err := exec.LookPath("java"); err != nil {
+		return err
 	}
 
 	var cmdArgs []string
@@ -92,28 +92,21 @@ func Run(args CliArgs) error {
 		cmdArgs = append(cmdArgs, "-m", args.ModuleFilter)
 	}
 	cmdArgs = append(cmdArgs, args.State, args.City)
-	syntheaBin := path.Join(state.installPath, "run_synthea")
+	syntheaBin := path.Join(*InstallPath, "run_synthea")
 
 	cmd := exec.Command(syntheaBin, cmdArgs...)
-	cmd.Dir = state.installPath
+	cmd.Dir = *InstallPath
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-
+	logger.Debug(fmt.Sprintf("Running: %v", cmd))
 	return cmd.Run()
 }
 
 // GetInstallPath returns the temporary directory Synthea was cloned to.
-// Returns an error if the the installPath has not been set in package state.
+// Returns an error if the the InstallPath has not been set in package state.
 func GetInstallPath() (string, error) {
-	if state.installPath == "" {
+	if InstallPath == nil {
 		return "", errors.New("synthea not installed -- must run synthea.Clone()")
 	}
-	return state.installPath, nil
-}
-
-func init() {
-	// Check for host dependencies
-	if errs := dependency.IsInstalled("java"); errs != nil {
-		logger.Fatal(errs)
-	}
+	return *InstallPath, nil
 }
